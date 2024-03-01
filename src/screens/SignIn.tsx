@@ -2,6 +2,7 @@ import { Center, Heading, Image, Text, VStack } from "native-base";
 
 import BackgroundImg from "@assets/background.png";
 import LogoSvg from "@assets/logo.svg";
+import { Input } from "@components/Input";
 
 export function SignIn() {
   return (
@@ -18,6 +19,7 @@ export function SignIn() {
           Treine seu corpo e sua mente
         </Text>
       </Center>
+
       <Center>
         <Heading
           color={"gray.100"}
@@ -27,6 +29,8 @@ export function SignIn() {
         >
           Acesse sua conta
         </Heading>
+        <Input placeholder="E-mail" />
+        <Input placeholder="Senha" />
       </Center>
     </VStack>
   );
