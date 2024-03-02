@@ -19,6 +19,7 @@ export function SignUp() {
       <VStack flex={1} bg={"gray.700"} px={10} pb={16}>
         <Image
           source={BackgroundImg}
+          defaultSource={BackgroundImg}
           alt="Pessoas pedalando"
           resizeMode="contain"
           position={"absolute"}
