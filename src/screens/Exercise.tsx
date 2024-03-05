@@ -28,7 +28,7 @@ export function Exercise() {
   return (
     <VStack flex={1}>
       <VStack bg={"gray.600"} px={8} pt={12}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleGoBack}>
           <Icon as={Feather} name="arrow-left" color={"green.500"} size={6} />
         </TouchableOpacity>
 
