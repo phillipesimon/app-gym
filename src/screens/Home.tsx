@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Center, FlatList, HStack, Heading, Text, VStack } from "native-base";
+import { FlatList, HStack, Heading, Text, VStack } from "native-base";
 
 import { Group } from "@components/Group";
 import { HomeHeader } from "@components/HomeHeader";
@@ -34,7 +34,7 @@ export function Home() {
           <Group
             name={item}
             isActive={
-              groupSelected.toLocaleUpperCase === item.toLocaleUpperCase
+              groupSelected.toLocaleUpperCase() === item.toLocaleUpperCase()
             }
             onPress={() => setGroupSelected(item)}
           />

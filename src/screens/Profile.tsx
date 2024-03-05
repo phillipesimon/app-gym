@@ -13,8 +13,39 @@ import {
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 
+import * as ImagePicker from "expo-image-picker";
+
 export function Profile() {
   const [photpIsLoading, setPhotpIsLoading] = useState(false);
+  const [userPhoto, setUserPhoto] = useState(
+    "https://github.com/phillipesimon.png"
+  );
+
+  async function handleUserPhotoSelect() {
+    setPhotpIsLoading(true);
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if (photoSelected.canceled) {
+        return;
+      }
+
+      if (photoSelected.assets[0].uri) {
+        setUserPhoto(photoSelected.assets[0].uri);
+      }
+
+      setUserPhoto(photoSelected.assets[0].uri);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setPhotpIsLoading(false);
+    }
+  }
   return (
     <VStack flex={1}>
       <ScreenHeader title="Perfil" />
@@ -30,7 +61,7 @@ export function Profile() {
             />
           ) : (
             <UserPhoto
-              source={{ uri: "https://github.com/phillipesimon.png" }}
+              source={{ uri: userPhoto }}
               alt="Foto do usuário"
               size={33}
             />
@@ -42,6 +73,7 @@ export function Profile() {
               fontSize={"md"}
               mt={2}
               mb={8}
+              onPress={handleUserPhotoSelect}
             >
               Alterar foto
             </Text>
