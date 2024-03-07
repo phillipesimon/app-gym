@@ -44,14 +44,17 @@ export function SignUp() {
   function handleGoBack() {
     navigation.goBack();
   }
-
-  function handleSignUp({
-    name,
-    email,
-    password,
-    password_confirm,
-  }: FormDataProps) {
-    console.log({ name, email, password, password_confirm });
+  async function handleSignUp({ name, email, password }: FormDataProps) {
+    const response = await fetch("http://192.168.3.3:3333/users", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, password }),
+    });
+    const data = await response.json();
+    console.log(data);
   }
 
   return (
