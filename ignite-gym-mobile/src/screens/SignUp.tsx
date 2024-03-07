@@ -51,7 +51,7 @@ export function SignUp() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-  https://github.com/phillipesimon/app-gym/watchers    body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password }),
     });
     const data = await response.json();
     console.log(data);
