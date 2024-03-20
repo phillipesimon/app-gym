@@ -21,6 +21,8 @@ import { Button } from "@components/Button";
 import { useAuth } from "@hooks/useAuth";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { AppError } from "@utils/AppError";
+import { api } from "@services/api";
 
 const PHOTO_SIZE = 33;
 
@@ -39,21 +41,31 @@ const profileSchema = yup.object({
     .min(6, "A senha deve ter pelo menos 6 dígitos.")
     .nullable()
     .transform((value) => (!!value ? value : null)),
+
   confirm_password: yup
     .string()
     .nullable()
     .transform((value) => (!!value ? value : null))
     .oneOf([yup.ref("password"), null], "A confirmação de senha não confere."),
+  // .when("password", {
+  //   is: (Field: any) => Field,
+  //   then: yup
+  //     .string()
+  //     .nullable()
+  //     .required("Informe a confirmação de senha")
+  //     .transform((value) => (!!value ? value : null)),
+  // }),
 });
 
 export function Profile() {
+  const [isUpdating, setIsUpdating] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(
     "https://github.com/phillipesimon.png"
   );
 
   const toast = useToast();
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
   const {
     control,
     handleSubmit,
@@ -104,7 +116,35 @@ export function Profile() {
   }
 
   async function handleProfileUpdate(data: FormDataProps) {
-    console.log(data);
+    try {
+      setIsUpdating(true);
+
+      const userUpdate = user;
+      userUpdate.name = data.name;
+
+      await api.put("/users", data);
+
+      await updateUserProfile(userUpdate);
+
+      toast.show({
+        title: "Perfil atualizado com sucesso",
+        placement: "top",
+        bgColor: "green.500",
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi posssivel atualizar os dados, tente novamente mais tarde.";
+
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   }
 
   return (
@@ -225,6 +265,7 @@ export function Profile() {
             title="Atualizar"
             mt={4}
             onPress={handleSubmit(handleProfileUpdate)}
+            isLoading={isUpdating}
           />
         </Center>
       </ScrollView>
