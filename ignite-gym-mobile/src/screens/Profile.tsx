@@ -14,6 +14,8 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as yup from "yup";
 
+import defaultUserPhotoImg from "@assets/userPhotoDefault.png";
+
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import { Input } from "@components/Input";
@@ -60,9 +62,6 @@ const profileSchema = yup.object({
 export function Profile() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState(
-    "https://github.com/phillipesimon.png"
-  );
 
   const toast = useToast();
   const { user, updateUserProfile } = useAuth();
@@ -89,6 +88,10 @@ export function Profile() {
         allowsEditing: true,
       });
 
+      if (photoSelected.canceled) {
+        return;
+      }
+
       if (photoSelected.assets) {
         const fileInfo = await FileSystem.getInfoAsync(
           photoSelected.assets[0].uri
@@ -100,9 +103,42 @@ export function Profile() {
               placement: "top",
               bgColor: "red.500",
             });
-          } else {
-            setUserPhoto(photoSelected.assets[0].uri);
           }
+
+          // setUserPhoto(photoSelected.assets[0].uri);
+
+          const fileExtension = photoSelected.assets[0].uri.split(".").pop();
+          const photoFile = {
+            name: `${user.name}.${fileExtension}`.toLowerCase(),
+            uri: photoSelected.assets[0].uri,
+            type: `${photoSelected.assets[0].type}/${fileExtension}`,
+          } as any;
+
+          const userPhotoUploadForm = new FormData();
+
+          userPhotoUploadForm.append("avatar", photoFile);
+
+          const avatarUpdatedResponse = await api.patch(
+            "/users/avatar",
+            userPhotoUploadForm,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          const userUpdated = user;
+          userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+          await updateUserProfile(userUpdated);
+
+          console.log(userUpdated);
+
+          toast.show({
+            title: "Photo Upload",
+            placement: "top",
+            bgColor: "green.500",
+          });
         }
       } else {
         console.log("Foto não selecionada");
@@ -163,7 +199,11 @@ export function Profile() {
             />
           ) : (
             <UserPhoto
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar
+                  ? { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` }
+                  : defaultUserPhotoImg
+              }
               alt="Foto do usuário"
               size={PHOTO_SIZE}
             />

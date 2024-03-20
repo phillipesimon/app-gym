@@ -5,6 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@hooks/useAuth";
 
 import defaultUserPhotoImg from "@assets/userPhotoDefault.png";
+import { api } from "@services/api";
 
 export function HomeHeader() {
   const { user, signOut } = useAuth();
@@ -14,7 +15,7 @@ export function HomeHeader() {
       <UserPhoto
         source={
           user.avatar
-            ? { uri: "https://github.com/phillipesimon.png" }
+            ? { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` }
             : defaultUserPhotoImg
         }
         alt="Imagem do usuário"
